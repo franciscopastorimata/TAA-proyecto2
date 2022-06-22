@@ -4,6 +4,8 @@ from tensorflow.keras import layers
 from commet_experiment import save_experiment_commet
 
 def model_example(name, train_set, val_set, w_train):
+    pass
+    """
     model = tf.keras.models.Sequential([
                                         tf.keras.layers.SimpleRNN(64, return_sequences=True ,dropout=drop, recurrent_dropout=drop),
                                         tf.keras.layers.Dense(1, activation='relu')
@@ -17,4 +19,5 @@ def model_example(name, train_set, val_set, w_train):
         'val_rmsle': rmsle,
         'val_mae': mae,
     }
-    save_experiment_commet(name, model, historys, history, metrics):
+    save_experiment_commet(name, model, historys, history, metrics)
+    """

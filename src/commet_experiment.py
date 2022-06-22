@@ -1,4 +1,5 @@
 from comet_ml import Experiment
+import os
 
 def save_experiment_commet(name, model, historys, history, metrics):
 
@@ -14,12 +15,14 @@ def save_experiment_commet(name, model, historys, history, metrics):
     if not os.path.exists('models'):
         os.makedirs('models')
     
+    """
     model_path = os.path.join('models',name+'.h5')
     tf.keras.models.save_model(model, model_path)
     exp.log_model('nlp-rnn', model_path)
+    """
 
     exp.log_metrics(metrics)
     exp.end()
 
 if __name__ == '__main__':
-pass
+    pass
