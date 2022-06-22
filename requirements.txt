@@ -1,0 +1,9 @@
+comet_ml
+tensorflow
+pandas
+numpy
+scikit-learn
+matplotlib
+os-sys
+syspath
+python-dotenv
