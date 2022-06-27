@@ -18,29 +18,29 @@ def read_full_tf_training_records():
         [f"{TRAIN_FULL_TF_RECORDS_PATH}/{tf_record_name}"
          for tf_record_name in os.listdir(TRAIN_FULL_TF_RECORDS_PATH)])
 
-def read_tf_training_records():
+def read_tf_training_record():
     return tf.data.TFRecordDataset(
         [f"{TRAIN_TF_RECORDS_PATH}"])
 
-def read_tf_val_records():
+def read_tf_val_record():
     return tf.data.TFRecordDataset(
         [f"{VAL_TF_RECORDS_PATH}"])
 
 def _parse_image_function(example_proto):
-  # Parse the input tf.train.Example proto using the dictionary above.
+    # Parse the input tf.train.Example proto using the dictionary above.
     parsed_features = tf.io.parse_single_example(example_proto, image_feature_description)
     return parsed_features['image'], parsed_features['level_cat']
-  
-def get_train_dataset():
-    train_dataset = read_tf_training_records()
-    parsed_image_dataset = train_dataset.map(_parse_image_function)
-    return parsed_image_dataset
 
-def get_valid_dataset():
-    val_dataset = read_tf_training_records()
-    parsed_image_dataset = val_dataset.map(_parse_image_function)
-    return parsed_image_dataset
-
+def get_dataset(set='train'):
+    if set == 'train':
+        tf_record_dataset = read_tf_training_record()
+    elif set == 'validation':
+        tf_record_dataset = read_tf_val_record()
+    else:
+        raise ValueError(f'"{set}" is not a valid set, valid sets are "train" and "validation"')
+    dataset = tf_record_dataset.map(_parse_image_function)    
+    # preprocess
+    return dataset
 
 if __name__ == '__main__':
     pass

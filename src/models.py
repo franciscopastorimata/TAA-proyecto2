@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 #from commet_experiment import save_experiment_commet
-from read_records import get_train_dataset, get_valid_dataset
+from read_records import get_dataset
 
 def model_example(name, train_set, val_set, w_train):
     pass
@@ -57,8 +57,8 @@ def create_simple_cnn(N=2, input_shape=(28,28, 1), activation='relu', optimizer=
     return model
 
 if __name__ == '__main__':
-    train_dataset = get_train_dataset()
-    valid_dataset = get_valid_dataset()
+    train_dataset = get_dataset('train')
+    valid_dataset = get_dataset('validation')
     model = create_simple_cnn(N=2, input_shape=(1024,683,3),learning_rate=5e-4)
     history = model.fit(train_dataset, epochs=10, validation_data=valid_dataset)
     print(history.history)
