@@ -3,7 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow_addons as tfa
 from sklearn.model_selection import GridSearchCV
-from read_records import read_tf_training_records, read_tf_val_records, preprocess
+from read_records import read_tf_training_record, read_tf_val_record, preprocess
 import numpy as np
 from comet_ml import Experiment
 #from commet_experiment import save_experiment_commet
@@ -20,22 +20,15 @@ def run_first_experiment(name, img_size):
     exp.set_name(name)
 
     #Carga de datos y preprocesado
-    train_dataset = read_tf_training_records()
+    train_dataset = read_tf_training_record()
     train_dataset = train_dataset.map(preprocess)
     
-    valid_dataset = read_tf_val_records()
+    valid_dataset = read_tf_val_record()
     valid_dataset = valid_dataset.map(preprocess)
 
-    num_of_elements = 35126
-    if img_size == 512:
-      batch_size=16
-    elif img_size == 256 or img_size == 384:
-      batch_size=32
-    elif img_size == 128:
-      batch_size=64
-    
-    ds_train = train_dataset.batch(batch_size).prefetch(1)
-    ds_val = valid_dataset.batch(batch_size).prefetch(1)
+    batch_size=256
+    ds_train = train_dataset.take(15).batch(batch_size).prefetch(1)
+    ds_val = valid_dataset.take(5).batch(batch_size).prefetch(1)
 
     #Modelo
     base_model = tf.keras.applications.Xception(
@@ -76,27 +69,19 @@ def run_first_experiment(name, img_size):
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
         loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        metrics=[metric, 'accuracy'])
+        metrics=[metric])
    
     #model.summary()
     #Entrenamiento
     
     history = model.fit(ds_train, validation_data=ds_val, epochs = 6)
-
-    '''  
-    # Se realiza la busqueda de hiperparámetros
-    print(searcher.best_params_)
-    exp.log_parameters(params)
-    exp.log_parameters(searcher.best_params_, prefix='best')
-    save_gs_results(exp, searcher) 
-    '''   
     
     # Se guarda el modelo
     #best_estimator = searcher.best_estimator_
     if not os.path.exists('models'):
         os.makedirs('models')
     
-    model_path = os.path.join('./../saved_models/first_model',name+'.h5')
+    model_path = os.path.join('./',name+'.h5')
     tf.keras.models.save_model(model, model_path)
     exp.log_model('retino', model_path)
     
@@ -106,8 +91,3 @@ if __name__ == '__main__':
     name = 'first_model'
     img_size = 256
     run_first_experiment(name = name+'-img_size='+str(img_size), img_size = img_size)
-    train_dataset = get_dataset('train')
-    valid_dataset = get_dataset('validation')
-    model = create_simple_cnn(N=2, input_shape=(1024,683,3),learning_rate=5e-4)
-    history = model.fit(train_dataset, epochs=10, validation_data=valid_dataset)
-    print(history.history)
