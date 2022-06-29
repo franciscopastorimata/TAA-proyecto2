@@ -6,6 +6,8 @@ from sklearn.model_selection import GridSearchCV
 from read_records import read_tf_training_records, read_tf_val_records, preprocess
 import numpy as np
 from comet_ml import Experiment
+#from commet_experiment import save_experiment_commet
+from read_records import get_dataset
 
 def run_first_experiment(name, img_size):
     
@@ -104,3 +106,8 @@ if __name__ == '__main__':
     name = 'first_model'
     img_size = 256
     run_first_experiment(name = name+'-img_size='+str(img_size), img_size = img_size)
+    train_dataset = get_dataset('train')
+    valid_dataset = get_dataset('validation')
+    model = create_simple_cnn(N=2, input_shape=(1024,683,3),learning_rate=5e-4)
+    history = model.fit(train_dataset, epochs=10, validation_data=valid_dataset)
+    print(history.history)
