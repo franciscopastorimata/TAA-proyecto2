@@ -4,6 +4,7 @@ import os
 TRAIN_FULL_TF_RECORDS_PATH = "./../data/retinopatia_entrenamiento/tf_records"
 TRAIN_TF_RECORDS_PATH = "./../data/retinopatia_entrenamiento/images_train.tfrec"
 VAL_TF_RECORDS_PATH = "./../data/retinopatia_entrenamiento/images_val.tfrec"
+TEST_TF_RECORDS_PATH = ""
 
 # Create a dictionary describing the features.
 image_feature_description = {
@@ -26,6 +27,10 @@ def read_tf_val_records():
     return tf.data.TFRecordDataset(
         [f"{VAL_TF_RECORDS_PATH}"])
 
+def read_tf_test_records():
+    return tf.data.TFRecordDataset(
+        [f"{TEST_TF_RECORDS_PATH}"])
+
 def _parse_image_function(example_proto):
   # Parse the input tf.train.Example proto using the dictionary above.
     parsed_features = tf.io.parse_single_example(example_proto, image_feature_description)
@@ -41,6 +46,15 @@ def get_valid_dataset():
     parsed_image_dataset = val_dataset.map(_parse_image_function)
     return parsed_image_dataset
 
+def preprocess(serialized_example):
+    img_size = 256
+    parsed_example = tf.io.parse_single_example(serialized_example, image_feature_description)
+    label = parsed_example['level_cat']
+    decoded_img = tf.io.decode_jpeg(parsed_example["image"])
+    decoded_img = tf.image.convert_image_dtype(decoded_img, tf.float32)
+    decoded_img_resized = tf.image.resize(decoded_img, [img_size, img_size])
+  
+    return decoded_img_resized, tf.one_hot(label, depth=5)
 
 if __name__ == '__main__':
     pass
