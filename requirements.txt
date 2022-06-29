@@ -7,3 +7,5 @@ matplotlib
 os-sys
 syspath
 python-dotenv
+sklearn
+shutil
