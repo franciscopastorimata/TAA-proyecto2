@@ -9,6 +9,8 @@ from comet_ml import Experiment
 #from commet_experiment import save_experiment_commet
 from read_records import get_dataset
 
+NUM_CLASSES = 5
+
 def run_first_experiment(name, img_size):
     
     # Se crea un experimento utilizando nuestra API_KEY
@@ -61,15 +63,15 @@ def run_first_experiment(name, img_size):
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
 
     x = tf.keras.layers.Dropout(0.2)(x)  # Regularize with dropout
-    outputs = tf.keras.layers.Dense(5)(x)
+    outputs = tf.keras.layers.Dense(NUM_CLASSES)(x)
     model = tf.keras.Model(inputs, outputs)
-
-    metric = tfa.metrics.CohenKappa(num_classes=5, sparse_labels=False, weightage='quadratic')
-    
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        metrics=[metric])
+        optimizer=tf.keras.optimizers.Adam(learning_rate = 1e-4),
+        loss = tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+        metrics = [tfa.metrics.CohenKappa(num_classes=NUM_CLASSES, weightage='quadratic', name = 'quadratic_weighted_kappa')],
+        callbacks = [
+            keras.callbacks.ModelCheckpoint("best_model.h5", save_best_only=True),
+            keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True)])
    
     #model.summary()
     #Entrenamiento
